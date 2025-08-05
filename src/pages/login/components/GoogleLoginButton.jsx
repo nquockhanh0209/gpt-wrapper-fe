@@ -1,10 +1,9 @@
-// src/components/GoogleLoginButton.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 // If you centralized endpoints:
-import { API, url } from "../config/config.ts";
-import { LoginRequestDTO } from "../dtos/LoginRequestDTO.ts"; // Adjust the import path as necessary
+import { API, url } from "../../../config/config.ts";
+// import { LoginRequestDTO } from "../dtos/LoginRequestDTO.ts"; // Adjust the import path as necessary
 
 export default function GoogleLoginButton() {
   const [error, setError] = useState("");

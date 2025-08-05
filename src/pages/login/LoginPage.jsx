@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import GoogleLoginButton from "../components/GoogleLoginButton"; // <-- import it
-// If you centralized endpoints, import them; otherwise keep your hard-coded URL
-// import { API, url } from "../config/api";
+import { useNavigate, Link } from "react-router-dom";
+import GoogleLoginButton from "./components/GoogleLoginButton";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -16,7 +14,6 @@ export default function LoginPage() {
 
     try {
       const res = await fetch("/api/auth/login", {
-        // or: fetch(url(API.auth.login), { ...
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -78,8 +75,18 @@ export default function LoginPage() {
           <div className="flex-1 h-px bg-gray-200" />
         </div>
 
-        {/* Render the Google button here */}
         <GoogleLoginButton />
+
+        {/* 🔽 Register button here */}
+        <div className="mt-6 text-center">
+          <span className="text-sm text-gray-600">Don’t have an account? </span>
+          <Link
+            to="/register"
+            className="text-sm text-blue-600 hover:underline font-medium"
+          >
+            Register
+          </Link>
+        </div>
       </div>
     </div>
   );
