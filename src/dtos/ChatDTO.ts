@@ -1,10 +1,7 @@
-export class ChatDTO {
-  public id: string = "";
-  public question: string = "";
-  public response: string = "";
-  public model: string = "";
+export type ChatDTO = {
+  id: string
+  question: string
+  response: string
+  model: string
 
-  constructor(init?: Partial<ChatDTO>) {
-    Object.assign(this, init);
-  }
 }
