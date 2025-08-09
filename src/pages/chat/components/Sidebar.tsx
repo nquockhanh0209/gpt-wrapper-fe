@@ -17,7 +17,7 @@ const Sidebar: React.FC<ChatSidebarProps> = ({
   useEffect(() => {
     (async () => {
       var resConversations = await getConversation(teamId);
-      console.log(resConversations);
+      console.log(typeof resConversations);
       
       setConversations(resConversations);
     })();
