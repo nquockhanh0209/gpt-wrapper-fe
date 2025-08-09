@@ -61,7 +61,7 @@ export const continueConversation = async (
   console.log(dto);
 
   try {
-    const response = await axiosClient.post(API.auth.conversationStartChat, dto);
+    const response = await axiosClient.post(API.auth.conversationContinueChat, dto);
     return response.data;
   } catch (error: any) {
     console.error("Error continue conversation:", error);
