@@ -7,7 +7,12 @@ export const API = {
     login: "/auth/login",
     refresh: "/auth/refresh",
     me: "/auth/me",
-    createTeam: "/team"
+    team: "/team",
+    conversation: "/conversation",
+    conversationContinueChat: "/conversation/continue-chat",
+    conversationStartChat: "/conversation/start-chat",
+
+    conversationGetChatResponse: "/conversation/get-chat-response",
   },
 
   chat: {
@@ -21,3 +26,15 @@ export const API = {
 console.log(BASE_URL);
 
 export const url = (path: string) => `${BASE_URL}${path}`;
+
+export const isSavedLocalStorage = (key: string) => {
+  return (
+    !!localStorage.getItem(key) &&
+    localStorage.getItem(key) !== undefined &&
+    localStorage.getItem(key) !== "undefined"
+  );
+};
+
+export const getFromLocalStorage = (key) => {
+  return localStorage.getItem(key);
+}

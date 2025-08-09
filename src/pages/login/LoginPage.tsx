@@ -1,34 +1,77 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import GoogleLoginButton from "./components/GoogleLoginButton";
+import GoogleLoginButton from "./components/GoogleLoginButton.jsx";
+import { API, url } from "../../config/config.ts";
+import { LoginRequestDTO } from "../../dtos/LoginRequestDTO.ts"; // Adjust the import path as necessary
+import { LoginType } from "../../dtos/enums/LoginType.ts"; // Adjust the import path as necessary
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
   const navigate = useNavigate();
 
+  const onLoginRequestSent = async (res) => {
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      console.log(res);
+      console.log(data.error);
+      console.log(data.message);
+      throw new Error(data.error || data.message || "Google login failed");
+    }
+    if (data.type === "Bearer") {
+      const token = data.token;
+      const userDTO = data.userDTO;
+      localStorage.setItem("token", token);
+      localStorage.setItem("username", userDTO.username);
+      localStorage.setItem("email", userDTO.email);
+      navigate("/team");
+    }
+  };
+
+  const sendRequestLogin = async (loginRequestDTO) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    console.log(loginRequestDTO);
+
+    const res = await fetch(url(API.auth.login), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(loginRequestDTO),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+    return res;
+  };
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      var loginRequestDTO = new LoginRequestDTO();
+      loginRequestDTO.email = email;
+      loginRequestDTO.password = password;
+      loginRequestDTO.loginType = LoginType.EMAIL_PASSWORD;
 
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(data.message || "Invalid credentials");
-      }
-
-      localStorage.setItem("accessToken", data.accessToken);
-      navigate("/chat");
+      var res = await sendRequestLogin(loginRequestDTO);
+      await onLoginRequestSent(res);
     } catch (e) {
       setError(e.message);
     }
+  };
+
+  const handleGoogleLogin = async (credentialResponse) => {
+    const idToken = credentialResponse.credential;
+
+    var loginRequestDTO = new LoginRequestDTO();
+    loginRequestDTO.idToken = idToken;
+    loginRequestDTO.loginType = LoginType.GOOGLE;
+
+    var res = await sendRequestLogin(loginRequestDTO);
+
+    await onLoginRequestSent(res);
   };
 
   return (
@@ -75,7 +118,7 @@ export default function LoginPage() {
           <div className="flex-1 h-px bg-gray-200" />
         </div>
 
-        <GoogleLoginButton />
+        <GoogleLoginButton handleGoogleLogin={handleGoogleLogin} />
 
         {/* 🔽 Register button here */}
         <div className="mt-6 text-center">

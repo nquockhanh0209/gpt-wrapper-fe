@@ -1,48 +1,18 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 // If you centralized endpoints:
-import { API, url } from "../../../config/config.ts";
+
 // import { LoginRequestDTO } from "../dtos/LoginRequestDTO.ts"; // Adjust the import path as necessary
 
-export default function GoogleLoginButton() {
+export default function GoogleLoginButton({ handleGoogleLogin }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleSuccess = async (credentialResponse) => {
     setError("");
     setLoading(true);
     try {
-      const idToken = credentialResponse.credential;
-      console.log("Google ID Token:", idToken);
-      console.log(
-        "Google ID Token:",
-        `${process.env.REACT_APP_API_BASE_URL}${API.auth.google}`
-      );
-      var loginRequestDTO = {
-        loginType: "GOOGLE",
-        idToken: idToken,
-      };
-      // If you have a central API config, use: fetch(url(API.auth.google), { ... })
-      const res = await fetch(url(API.auth.login), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(loginRequestDTO),
-      });
-      console.log(res.text());
-
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        console.log(res);
-        console.log(data.error);
-        console.log(data.message);
-        throw new Error(data.error || data.message || "Google login failed");
-      }
-
-      // Expecting { accessToken, expiresIn, tokenType } from backend
-      localStorage.setItem("accessToken", data.accessToken);
-      navigate("/chat");
+      await handleGoogleLogin(credentialResponse);
     } catch (e) {
       console.log(e.message);
       setError(e.message || "Google login failed");
